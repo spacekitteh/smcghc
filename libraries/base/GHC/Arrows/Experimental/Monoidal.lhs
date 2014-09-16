@@ -10,7 +10,7 @@ import GHC.Arrows.Experimental.Isomorphism
 
 class (Binoidal k p, Associative k p) => PreMonoidal k p where
     {-# MINIMAL (leftUnitor, rightUnitor) |
- (introduceLeft, introduceRight, eliminateLeft, eliminateRight) #-}
+     (introduceLeft, introduceRight, eliminateLeft, eliminateRight) #-}
     type Id k p :: *
     leftUnitor :: Isomorphism ((Id k p) `p` b) k b
     leftUnitor = Isomorphism (eliminateLeft, introduceLeft)
