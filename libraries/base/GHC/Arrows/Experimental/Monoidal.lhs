@@ -2,11 +2,13 @@
 
 {-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses #-}
 {-#LANGUAGE PolyKinds, TypeFamilies, TypeOperators #-}
-
+{-#LANGUAGE OverlappingInstances, FlexibleInstances #-}
 module GHC.Arrows.Experimental.Monoidal where
 import GHC.Arrows.Experimental.Associative
 import GHC.Arrows.Experimental.Binoidal
 import GHC.Arrows.Experimental.Isomorphism
+
+import Control.Arrow
 
 class (Binoidal k p, Associative k p) => PreMonoidal k p where
     {-# MINIMAL (leftUnitor, rightUnitor) |
@@ -31,6 +33,12 @@ instance PreMonoidal (->) (,) where
     eliminateRight (a, ()) = a
     introduceLeft b = ((),b)
     introduceRight a = (a, ())
+instance Arrow a => PreMonoidal a (,) where
+    type Id a (,) = ()
+    eliminateLeft = arr (\((),b) -> b)
+    introduceLeft = arr (\b -> ((),b))
+    eliminateRight = arr (\(a,()) -> a)
+    introduceRight = arr (\a -> (a, ()))
 
 class PreMonoidal k p => Monoidal k p
 

@@ -2,13 +2,15 @@ An associator in category theory and higher category theory is an isomorphism th
 
 \begin{code}
 {-# LANGUAGE NoImplicitPrelude, MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds, TypeOperators #-}
+{-#LANGUAGE PolyKinds, TypeOperators, FlexibleInstances, OverlappingInstances#-}
 
 module GHC.Arrows.Experimental.Associative where
 
 import GHC.Arrows.Experimental.Binoidal
 import GHC.Arrows.Experimental.GBifunctor
 import GHC.Arrows.Experimental.Isomorphism
+
+import Control.Arrow
 
 import Data.Either
 
@@ -34,5 +36,7 @@ instance Associative (->) Either where
         associateLeft (Right (Left b)) = Left (Right b)
         associateLeft (Right (Right c)) = Right c
 
-
+instance Arrow a => Associative a (,) where
+    associateRight = arr (\((x,y),z) -> (x,(y,z)))
+    associateLeft =  arr (\(x,(y,z)) -> ((x,y),z))
 \end{code}

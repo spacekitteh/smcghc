@@ -8,8 +8,8 @@ A \textbf{binoidal category} is a category $C$ equipped with
 \end{itemize}
 
 \begin{code}
-{-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses #-}
-{-#LANGUAGE PolyKinds, TypeOperators, FlexibleInstances #-}
+{-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses, FlexibleInstances #-}
+{-#LANGUAGE PolyKinds, TypeOperators, OverlappingInstances #-}
 
 module GHC.Arrows.Experimental.Binoidal where
 

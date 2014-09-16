@@ -20,17 +20,20 @@ import Data.Either
 
 class (Category r, Category s, Category t) =>
   GBifunctor p r s t | p r -> s t, p s -> r t, p t -> r s, p r s -> t where
-    {-# MINIMAL bimap #-}
+    {-# MINIMAL construct, bimap #-}
     bimap :: r a b -> s c d -> t (p a c) (p b d)
     left :: r a b -> t (p a c) (p b c)
     left f = bimap f id
     right :: s a b -> t (p c a) (p c b)
     right f = bimap id f
+    construct :: a -> b -> p a b
 
 instance GBifunctor Either (->) (->) (->) where
     bimap f _ (Left a) = Left (f a)
     bimap _ g (Right a) = Right (g a)
+    construct _ b = Right b
 
 instance Arrow a => GBifunctor (,) a a a where
    bimap = (***)
+   construct a b = (a,b)
 \end{code}
