@@ -5,6 +5,9 @@
 module GHC.Arrows.Experimental.Monoidal where
 import GHC.Arrows.Experimental.Associative
 import GHC.Arrows.Experimental.Binoidal
+import GHC.Arrows.Experimental.Isomorphism
+
+
 import Control.Category
 import Data.Either
 

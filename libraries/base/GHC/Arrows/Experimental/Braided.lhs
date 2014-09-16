@@ -10,6 +10,7 @@ Braiding introduces a "swap" function, which switches the objects in a bifunctor
 module GHC.Arrows.Experimental.Braided where
 
 import GHC.Arrows.Experimental.Associative
+import GHC.Arrows.Experimental.Isomorphism
 
 import Control.Category
 import Data.Either

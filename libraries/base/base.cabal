@@ -182,6 +182,7 @@ Library
         GHC.Arrows.Experimental.Binoidal
         GHC.Arrows.Experimental.Braided
         GHC.Arrows.Experimental.GBifunctor
+        GHC.Arrows.Experimental.Isomorphism
         GHC.Arrows.Experimental.Monoidal
         GHC.Base
         GHC.Char

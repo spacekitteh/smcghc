@@ -7,25 +7,20 @@ module GHC.Arrows.Experimental.Associative where
 
 import GHC.Arrows.Experimental.Binoidal
 import GHC.Arrows.Experimental.GBifunctor
+import GHC.Arrows.Experimental.Isomorphism
 
 import Control.Category
 import Data.Either
-import Data.Tuple 
 
-newtype Isomorphism a k b = Isomorphism {getMorphisms :: (a `k` b, b `k` a)}
 
-isoTo :: Category k => Isomorphism a k b -> a `k` b
-isoTo = (fst . getMorphisms)
-isoFrom :: Category k => Isomorphism a k b -> b `k` a
-isoFrom = (snd . getMorphisms)
 class (Bifunctor p k k k, Binoidal k p) => Associative k p where
     {-# MINIMAL associator | (associateLeft, associateRight) #-}
     associator :: Isomorphism ((a `p` b) `p` c) k  (a `p` (b `p` c))
     associator = Isomorphism (associateRight, associateLeft)
     associateRight :: ((a `p` b) `p` c) `k` (a `p` (b `p` c))
-    associateRight =  (fst . getMorphisms) associator
+    associateRight =  isoTo associator
     associateLeft :: (a `p` (b `p` c)) `k` ((a `p` b) `p` c)
-    associateLeft = (snd . getMorphisms) associator
+    associateLeft = isoFrom associator
 
 instance Associative (->) (,) where
         associateRight ((a,b),c) = (a,(b,c))
