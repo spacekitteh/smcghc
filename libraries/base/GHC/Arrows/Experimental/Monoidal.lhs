@@ -1,6 +1,6 @@
 \begin{code}
 
-{-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses, PolyKinds, TypeFamilies #-}
+{-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses, PolyKinds, TypeFamilies, TypeOperators #-}
 
 module GHC.Arrows.Experimental.Monoidal where
 import GHC.Arrows.Experimental.Associative
@@ -10,10 +10,10 @@ import Data.Either
 
 class (Binoidal k p, Associative k p) => PreMonoidal k p where
     type Id k p :: *
-    eliminateLeft :: k (p (Id k p) b) b
-    eliminateRight ::k (p a (Id k p)) a
-    introduceLeft :: k b (p (Id k p) b)
-    introduceRight :: k a (p a (Id k p))
+    eliminateLeft :: ((Id k p) `p` b) `k` b
+    eliminateRight :: (a `p` (Id k p)) `k` a
+    introduceLeft :: b `k` ((Id k p) `p` b)
+    introduceRight :: a `k` (a `p` (Id k p))
 
 instance PreMonoidal (->) (,) where
     type Id (->) (,) = ()
