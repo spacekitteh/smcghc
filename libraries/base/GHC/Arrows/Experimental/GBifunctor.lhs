@@ -17,6 +17,7 @@ import Data.Either
 
     -- | Minimal definition: @bimap@, @left@, @right@
 class (Category r, Category s, Category t) => Bifunctor p r s t | p r -> s t, p s -> r t, p t -> r s, p r s -> t where
+    {-# MINIMAL bimap, construct #-}
     bimap :: r a b -> s c d -> t (p a c) (p b d)
     left :: r a b -> t (p a c) (p b c)
     left f = bimap f id

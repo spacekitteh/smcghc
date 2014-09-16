@@ -6,6 +6,7 @@ Braiding introduces a "swap" function, which switches the objects in a bifunctor
 
 {-#LANGUAGE PolyKinds, MultiParamTypeClasses, NoImplicitPrelude, TypeOperators #-}
 
+
 module GHC.Arrows.Experimental.Braided where
 
 import GHC.Arrows.Experimental.Associative
@@ -15,6 +16,7 @@ import Data.Either
 import Data.Tuple
 
 class Associative k p => Braided k p where
+    {-#MINIMAL braiding | (braid,unbraid) #-}
     braiding :: Isomorphism (p a b) k (p b a)
     braiding = Isomorphism (braid, unbraid)
     braid :: (p a b) `k` (p b a)
@@ -25,13 +27,14 @@ class Associative k p => Braided k p where
 instance Braided (->) Either where
     braid (Left a) = Right a
     braid (Right b) = Left b
-
+    unbraid = braid
 instance Braided (->) (,) where
     braid ~(a,b) = (b,a)
+    unbraid = braid
 
 class Braided k p => Symmetric k p
 
-swap :: Symmetric k p => k (p a b) (p b a)
+swap :: Symmetric k p => (p a b) `k` (p b a)
 swap = braid
 
 instance Symmetric (->) Either
