@@ -17,9 +17,9 @@ class (Binoidal k p, Associative k p) => PreMonoidal k p where
     {-# MINIMAL (leftUnitor, rightUnitor) |
      (introduceLeft, introduceRight, eliminateLeft, eliminateRight) #-}
     type Id k p :: *
-    leftUnitor :: Isomorphism ((Id k p) `p` b) k b
+    leftUnitor :: Isomorphism k ((Id k p) `p` b) b
     leftUnitor = Isomorphism (eliminateLeft, introduceLeft)
-    rightUnitor :: Isomorphism (a `p` (Id k p)) k a
+    rightUnitor :: Isomorphism k (a `p` (Id k p)) a
     rightUnitor = Isomorphism (eliminateRight, introduceRight)
     eliminateLeft :: ((Id k p) `p` b) `k` b
     eliminateLeft = isoTo leftUnitor
@@ -56,7 +56,7 @@ class Category k => Reified k where
 class Reified k => ExtractableReification k where
     {-#MINIMAL reification | unreify #-}
     -- should this perhaps be (a -> b) k (k a b)???
-    reification :: Isomorphism (a -> b) (->) (k a b)
+    reification :: Isomorphism (->) (a -> b)  (k a b)
     reification = Isomorphism (reify, unreify)
     unreify :: (k a b) -> (a -> b)
     unreify = isoFrom reification

@@ -18,7 +18,7 @@ import Data.Either
 
 class Associative k p => Braided k p where
     {-#MINIMAL braiding | (braid,unbraid) #-}
-    braiding :: Isomorphism (p a b) k (p b a)
+    braiding :: Isomorphism k (p a b) (p b a)
     braiding = Isomorphism (braid, unbraid)
     braid :: (p a b) `k` (p b a)
     braid = isoTo braiding

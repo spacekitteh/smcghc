@@ -17,7 +17,7 @@ import Data.Either
 
 class (GBifunctor p k k k, Binoidal k p) => Associative k p where
     {-# MINIMAL associator | (associateLeft, associateRight) #-}
-    associator :: Isomorphism ((a `p` b) `p` c) k  (a `p` (b `p` c))
+    associator :: Isomorphism k ((a `p` b) `p` c) (a `p` (b `p` c))
     associator = Isomorphism (associateRight, associateLeft)
     associateRight :: ((a `p` b) `p` c) `k` (a `p` (b `p` c))
     associateRight =  isoTo associator
