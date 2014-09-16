@@ -11,7 +11,10 @@ is also called a bifunctor from $C_1$ and $C_2$ to $D$.
 {-#LANGUAGE MultiParamTypeClasses#-}
 {-#LANGUAGE FunctionalDependencies#-}
 {-#LANGUAGE NoImplicitPrelude#-}
+{-#LANGUAGE FlexibleInstances#-}
 module GHC.Arrows.Experimental.GBifunctor where
+
+import Control.Arrow
 import Control.Category
 import Data.Either
 
@@ -24,10 +27,10 @@ class (Category r, Category s, Category t) =>
     right :: s a b -> t (p c a) (p c b)
     right f = bimap id f
 
-instance GBifunctor (,) (->) (->) (->) where
-    bimap f g (a,b)= (f a, g b)
-
 instance GBifunctor Either (->) (->) (->) where
     bimap f _ (Left a) = Left (f a)
     bimap _ g (Right a) = Right (g a)
+
+instance Arrow a => GBifunctor (,) a a a where
+   bimap = (***)
 \end{code}

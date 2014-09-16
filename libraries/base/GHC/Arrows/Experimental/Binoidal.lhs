@@ -9,12 +9,13 @@ A \textbf{binoidal category} is a category $C$ equipped with
 
 \begin{code}
 {-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses #-}
-{-#LANGUAGE PolyKinds, TypeOperators #-}
+{-#LANGUAGE PolyKinds, TypeOperators, FlexibleInstances #-}
 
 module GHC.Arrows.Experimental.Binoidal where
 
 import GHC.Arrows.Experimental.GBifunctor
 
+import Control.Arrow
 import Control.Category
 import Data.Either
 
@@ -33,4 +34,14 @@ instance Binoidal (->) (,) where
 instance Binoidal (->) Either where
   inLeft a = \_ -> Left a
   inRight b = \_ -> Right b
+
+\end{code}
+
+Arrow instances:
+
+\begin{code}
+
+instance (Arrow a) => Binoidal a (,) where
+    inLeft = arr (\x -> arr(\y -> (x,y)))
+    inRight = arr(\y -> arr(\x -> (x,y)))
 \end{code}
