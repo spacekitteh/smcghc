@@ -20,8 +20,11 @@ import Control.Category
 import Data.Either
 
 class (Category k, GBifunctor p k k k) => Binoidal k p where
+  -- | Inject a value into the left side of the bifunctor
   inLeft :: a `k` (b `k` (p a b))
+  -- | Inject a value into the right side of the bifunctor
   inRight :: b `k` (a `k` (p a b))
+
 \end{code}
 
 Some example instances for both product and sum types:
