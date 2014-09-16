@@ -2,7 +2,7 @@
 module GHC.Arrows.Experimental.Isomorphism where
 
 import Control.Category
-import Data.Tuple 
+import Data.Tuple
 
 newtype Isomorphism a k b = Isomorphism {getMorphisms :: (a `k` b, b `k` a)}
 

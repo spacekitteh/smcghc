@@ -1,7 +1,8 @@
 An associator in category theory and higher category theory is an isomorphism that relaxes the ordinary associativity equality of a binary operation.
 
 \begin{code}
-{-# LANGUAGE NoImplicitPrelude, MultiParamTypeClasses, PolyKinds, TypeOperators #-}
+{-# LANGUAGE NoImplicitPrelude, MultiParamTypeClasses #-}
+{-# LANGUAGE PolyKinds, TypeOperators #-}
 
 module GHC.Arrows.Experimental.Associative where
 
@@ -12,7 +13,7 @@ import GHC.Arrows.Experimental.Isomorphism
 import Data.Either
 
 
-class (Bifunctor p k k k, Binoidal k p) => Associative k p where
+class (GBifunctor p k k k, Binoidal k p) => Associative k p where
     {-# MINIMAL associator | (associateLeft, associateRight) #-}
     associator :: Isomorphism ((a `p` b) `p` c) k  (a `p` (b `p` c))
     associator = Isomorphism (associateRight, associateLeft)

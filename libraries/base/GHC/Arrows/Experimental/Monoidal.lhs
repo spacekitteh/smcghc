@@ -1,6 +1,7 @@
 \begin{code}
 
-{-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses, PolyKinds, TypeFamilies, TypeOperators #-}
+{-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses #-}
+{-#LANGUAGE PolyKinds, TypeFamilies, TypeOperators #-}
 
 module GHC.Arrows.Experimental.Monoidal where
 import GHC.Arrows.Experimental.Associative
@@ -8,7 +9,8 @@ import GHC.Arrows.Experimental.Binoidal
 import GHC.Arrows.Experimental.Isomorphism
 
 class (Binoidal k p, Associative k p) => PreMonoidal k p where
-    {-# MINIMAL (leftUnitor, rightUnitor) | (introduceLeft, introduceRight, eliminateLeft, eliminateRight) #-}
+    {-# MINIMAL (leftUnitor, rightUnitor) |
+ (introduceLeft, introduceRight, eliminateLeft, eliminateRight) #-}
     type Id k p :: *
     leftUnitor :: Isomorphism ((Id k p) `p` b) k b
     leftUnitor = Isomorphism (eliminateLeft, introduceLeft)

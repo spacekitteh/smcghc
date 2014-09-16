@@ -4,7 +4,8 @@ Braiding introduces a "swap" function, which switches the objects in a bifunctor
 
 \begin{code}
 
-{-#LANGUAGE PolyKinds, MultiParamTypeClasses, NoImplicitPrelude, TypeOperators #-}
+{-#LANGUAGE PolyKinds, MultiParamTypeClasses, NoImplicitPrelude #-}
+{-#LANGUAGE TypeOperators #-}
 
 
 module GHC.Arrows.Experimental.Braided where
