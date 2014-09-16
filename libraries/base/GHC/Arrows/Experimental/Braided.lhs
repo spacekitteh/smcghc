@@ -12,9 +12,7 @@ module GHC.Arrows.Experimental.Braided where
 import GHC.Arrows.Experimental.Associative
 import GHC.Arrows.Experimental.Isomorphism
 
-import Control.Category
 import Data.Either
-import Data.Tuple
 
 class Associative k p => Braided k p where
     {-#MINIMAL braiding | (braid,unbraid) #-}

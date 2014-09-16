@@ -9,7 +9,6 @@ import GHC.Arrows.Experimental.Binoidal
 import GHC.Arrows.Experimental.GBifunctor
 import GHC.Arrows.Experimental.Isomorphism
 
-import Control.Category
 import Data.Either
 
 

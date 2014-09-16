@@ -7,10 +7,6 @@ import GHC.Arrows.Experimental.Associative
 import GHC.Arrows.Experimental.Binoidal
 import GHC.Arrows.Experimental.Isomorphism
 
-
-import Control.Category
-import Data.Either
-
 class (Binoidal k p, Associative k p) => PreMonoidal k p where
     {-# MINIMAL (leftUnitor, rightUnitor) | (introduceLeft, introduceRight, eliminateLeft, eliminateRight) #-}
     type Id k p :: *
