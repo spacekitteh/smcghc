@@ -178,6 +178,11 @@ Library
         Foreign.StablePtr
         Foreign.Storable
         GHC.Arr
+        GHC.Arrows.Experimental.Associative
+        GHC.Arrows.Experimental.Binoidal
+        GHC.Arrows.Experimental.Braided
+        GHC.Arrows.Experimental.GBifunctor
+        GHC.Arrows.Experimental.Monoidal
         GHC.Base
         GHC.Char
         GHC.Conc

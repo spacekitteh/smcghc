@@ -1,14 +1,26 @@
+An associator in category theory and higher category theory is an isomorphism that relaxes the ordinary associativity equality of a binary operation.
+
 \begin{code}
-{-# LANGUAGE NoImplicitPrelude, MultiParamTypeClasses, PolyKinds #-}
+{-# LANGUAGE NoImplicitPrelude, MultiParamTypeClasses, PolyKinds, TypeOperators #-}
 
 module GHC.Arrows.Experimental.Associative where
-import Control.Category
-import GHC.Arrows.Experimental.GBifunctor
-import Data.Either
 
-class (Bifunctor p k k k, Category k) => Associative k p where
-    associateRight :: k (p (p a b) c) (p a (p b c))
-    associateLeft :: k (p a (p b c)) (p (p a b) c)
+import GHC.Arrows.Experimental.Binoidal
+import GHC.Arrows.Experimental.GBifunctor
+
+import Control.Category
+import Data.Either
+import Data.Tuple 
+
+newtype Isomorphism k a b = Isomorphism {getMorphisms ::(b `k` a, a `k` b)}
+
+class (Bifunctor p k k k, Binoidal k p) => Associative k p where
+    associator :: Isomorphism k ((a `p` b) `p` c) (a `p` (b `p` c))
+    associator = Isomorphism (associateLeft, associateRight)
+    associateRight :: k ((a `p` b) `p` c) (a `p` (b `p` c))
+    associateRight =  (snd . getMorphisms) associator
+    associateLeft :: k (a `p` (b `p` c)) ((a `p` b) `p` c)
+    associateLeft = (fst . getMorphisms) associator
 
 instance Associative (->) (,) where
         associateRight ((a,b),c) = (a,(b,c))
