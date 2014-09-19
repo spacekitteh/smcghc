@@ -27,17 +27,17 @@ module Control.Arrow (
     -- * Arrows
     Arrow(..), Kleisli(..),
     -- ** Derived combinators
-    returnA,
-    (^>>), (>>^),
-    (>>>), (<<<), -- reexported
+--    returnA,
+--    (^>>), (>>^),
+--    (>>>), (<<<), -- reexported
     -- ** Right-to-left variants
-    (<<^), (^<<),
+--    (<<^), (^<<),
     -- * Monoid operations
     ArrowZero(..), ArrowPlus(..),
     -- * Conditionals
     ArrowChoice(..),
     -- * Arrow application
-    ArrowApply(..), ArrowMonad(..), leftApp,
+    ArrowApply(..), ArrowMonad(..), --leftApp,
     -- * Feedback
     ArrowLoop(..)
     ) where
@@ -83,7 +83,6 @@ infixr 1 ^<<, <<^
 -- which may be overridden for efficiency.
 
 class Category a => Arrow a where
-
     -- | Lift a function to an arrow.
     arr :: (b -> c) -> a b c
 
@@ -117,7 +116,27 @@ class Category a => Arrow a where
     (&&&) :: a b c -> a b c' -> a b (c,c')
     f &&& g = arr (\b -> (b,b)) >>> f *** g
 
-{-# RULES
+    -- | The identity arrow, which plays the role of 'return' in arrow notation.
+    returnA :: a b b
+    returnA = arr id
+
+    -- | Precomposition with a pure function.
+    (^>>) :: (b -> c) -> a c d -> a b d
+    f ^>> a = arr f >>> a
+
+    -- | Postcomposition with a pure function.
+    (>>^) :: a b c -> (c -> d) -> a b d
+    a >>^ f = a >>> arr f
+
+    -- | Precomposition with a pure function (right-to-left variant).
+    (<<^) :: a c d -> (b -> c) -> a b d
+    a <<^ f = a <<< arr f
+
+    -- | Postcomposition with a pure function (right-to-left variant).
+    (^<<) :: (c -> d) -> a b c -> a b d
+    f ^<< a = arr f <<< a
+
+{--{-# RULES
 "compose/arr"   forall f g .
                 (arr f) . (arr g) = arr (f . g)
 "first/arr"     forall f .
@@ -132,7 +151,7 @@ class Category a => Arrow a where
                 (first f) . (first g) = first (f . g)
 "compose/second" forall f g .
                 (second f) . (second g) = second (f . g)
- #-}
+ #-}--}
 
 -- Ordinary functions are arrows.
 
@@ -156,25 +175,7 @@ instance Monad m => Arrow (Kleisli m) where
     first (Kleisli f) = Kleisli (\ ~(b,d) -> f b >>= \c -> return (c,d))
     second (Kleisli f) = Kleisli (\ ~(d,b) -> f b >>= \c -> return (d,c))
 
--- | The identity arrow, which plays the role of 'return' in arrow notation.
-returnA :: Arrow a => a b b
-returnA = arr id
 
--- | Precomposition with a pure function.
-(^>>) :: Arrow a => (b -> c) -> a c d -> a b d
-f ^>> a = arr f >>> a
-
--- | Postcomposition with a pure function.
-(>>^) :: Arrow a => a b c -> (c -> d) -> a b d
-a >>^ f = a >>> arr f
-
--- | Precomposition with a pure function (right-to-left variant).
-(<<^) :: Arrow a => a c d -> (b -> c) -> a b d
-a <<^ f = a <<< arr f
-
--- | Postcomposition with a pure function (right-to-left variant).
-(^<<) :: Arrow a => (c -> d) -> a b c -> a b d
-f ^<< a = arr f <<< a
 
 class Arrow a => ArrowZero a where
     zeroArrow :: a b c
@@ -251,7 +252,7 @@ class Arrow a => ArrowChoice a where
         untag (Left x) = x
         untag (Right y) = y
 
-{-# RULES
+{--{-# RULES
 "left/arr"      forall f .
                 left (arr f) = arr (left f)
 "right/arr"     forall f .
@@ -264,7 +265,7 @@ class Arrow a => ArrowChoice a where
                 left f . left g = left (f . g)
 "compose/right" forall f g .
                 right f . right g = right (f . g)
- #-}
+ #-}--}
 
 instance ArrowChoice (->) where
     left f = f +++ id
@@ -291,6 +292,9 @@ instance Monad m => ArrowChoice (Kleisli m) where
 
 class Arrow a => ArrowApply a where
     app :: a (a b c, b) c
+    leftApp :: ArrowApply a => a b c -> a (Either b d) (Either c d)
+    leftApp f = arr ((\b -> (arr (\() -> b) >>> f >>> arr Left, ())) |||
+                 (\d -> (arr (\() -> d) >>> arr Right, ()))) >>> app
 
 instance ArrowApply (->) where
     app (f,x) = f x
@@ -326,9 +330,7 @@ instance (ArrowApply a, ArrowPlus a) => MonadPlus (ArrowMonad a) where
 -- | Any instance of 'ArrowApply' can be made into an instance of
 --   'ArrowChoice' by defining 'left' = 'leftApp'.
 
-leftApp :: ArrowApply a => a b c -> a (Either b d) (Either c d)
-leftApp f = arr ((\b -> (arr (\() -> b) >>> f >>> arr Left, ())) |||
-             (\d -> (arr (\() -> d) >>> arr Right, ()))) >>> app
+
 
 -- | The 'loop' operator expresses computations in which an output value
 -- is fed back as input, although the computation occurs only once.

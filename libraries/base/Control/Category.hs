@@ -60,5 +60,6 @@ instance Category Coercion where
 (<<<) = (.)
 
 -- | Left-to-right composition
+{-#NOINLINE (>>>)#-}
 (>>>) :: Category cat => cat a b -> cat b c -> cat a c
 f >>> g = g . f

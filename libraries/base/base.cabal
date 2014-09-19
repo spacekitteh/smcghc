@@ -178,6 +178,7 @@ Library
         Foreign.StablePtr
         Foreign.Storable
         GHC.Arr
+        GHC.Arrows.Experimental.ArrowTranslator
         GHC.Arrows.Experimental.Associative
         GHC.Arrows.Experimental.Binoidal
         GHC.Arrows.Experimental.Braided

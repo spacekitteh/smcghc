@@ -12,7 +12,7 @@ such that the following conditions hold.
 
 A monoidal category is a premonoidal category where $\otimes$ commutes in time.
 \begin{code}
-
+{-#OPTIONS_GHC -fno-warn-orphans #-}
 {-#LANGUAGE NoImplicitPrelude, MultiParamTypeClasses #-}
 {-#LANGUAGE PolyKinds, TypeFamilies, TypeOperators, ConstraintKinds #-}
 {-#LANGUAGE OverlappingInstances, FlexibleInstances, InstanceSigs #-}
@@ -80,6 +80,12 @@ class Reified k => ExtractableReification k where
 
 instance Arrow a => Reified a where
     reify = arr
+
+instance (Reified k, PreMonoidal k (,)) => Arrow k where
+    arr = reify
+    first = GHC.Arrows.Experimental.GBifunctor.left
+    second = GHC.Arrows.Experimental.GBifunctor.right
+
 
 class (Reified k, GBifunctor p k k k) => Application k p where
     apply :: k (p (k a b) a) b
