@@ -49,23 +49,24 @@ module Control.Applicative (
 
 import Control.Category
 import Control.Arrow
-import Control.Monad (liftM, ap, Monad(..), MonadPlus(..), Alternative(..))
-import Data.Functor ((<$>), (<$))
 import Data.Maybe
-import Data.Monoid (Monoid(..))
 import Data.Tuple
 import Data.Eq
 import Data.Ord
-import Data.Functor (Functor(..))
+import Data.Foldable (Foldable(..))
+import Data.Functor ((<$>))
 
-import GHC.Base (const, Applicative(..),liftA, liftA2, liftA3, (<**>))
+import GHC.Base hiding ((.), id)
 import GHC.Generics
-import GHC.List (map, repeat, zipWith)
+import GHC.List (repeat, zipWith)
 import GHC.Read (Read)
 import GHC.Show (Show)
 
 newtype Const a b = Const { getConst :: a }
                   deriving (Generic, Generic1)
+
+instance Foldable (Const m) where
+    foldMap _ _ = mempty
 
 instance Functor (Const m) where
     fmap _ (Const v) = Const v

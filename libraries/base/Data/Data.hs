@@ -107,7 +107,6 @@ module Data.Data (
 
 ------------------------------------------------------------------------------
 
-import Control.Monad
 import Data.Either
 import Data.Eq
 import Data.Maybe

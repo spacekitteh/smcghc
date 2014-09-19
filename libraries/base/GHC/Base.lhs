@@ -121,6 +121,7 @@ infixr 9  .
 infixr 5  ++
 infixl 4  <$
 infixl 1  >>, >>=
+infixr 1  =<<
 infixr 0  $, $!
 
 infixl 4 <*>, <*, *>, <**>
@@ -183,6 +184,29 @@ otherwise = True
 build = error "urk"
 foldr = error "urk"
 -}
+
+\end{code}
+
+%*********************************************************
+%*                                                      *
+\subsection{The Maybe type}
+%*                                                      *
+%*********************************************************
+\begin{code}
+
+-- | The 'Maybe' type encapsulates an optional value.  A value of type
+-- @'Maybe' a@ either contains a value of type @a@ (represented as @'Just' a@),
+-- or it is empty (represented as 'Nothing').  Using 'Maybe' is a good way to
+-- deal with errors or exceptional cases without resorting to drastic
+-- measures such as 'error'.
+--
+-- The 'Maybe' type is also a monad.  It is a simple kind of error
+-- monad, where all errors are represented by 'Nothing'.  A richer
+-- error monad can be built using the 'Data.Either.Either' type.
+--
+data  Maybe a  =  Nothing | Just a
+  deriving (Eq, Ord)
+
 \end{code}
 
 %*********************************************************
@@ -271,6 +295,18 @@ instance Monoid Ordering where
         LT `mappend` _ = LT
         EQ `mappend` y = y
         GT `mappend` _ = GT
+
+-- | Lift a semigroup into 'Maybe' forming a 'Monoid' according to
+-- <http://en.wikipedia.org/wiki/Monoid>: \"Any semigroup @S@ may be
+-- turned into a monoid simply by adjoining an element @e@ not in @S@
+-- and defining @e*e = e@ and @e*s = s = s*e@ for all @s ∈ S@.\" Since
+-- there is no \"Semigroup\" typeclass providing just 'mappend', we
+-- use 'Monoid' instead.
+instance Monoid a => Monoid (Maybe a) where
+  mempty = Nothing
+  Nothing `mappend` m = m
+  m `mappend` Nothing = m
+  Just m1 `mappend` Just m2 = Just (m1 `mappend` m2)
 
 instance Monoid a => Applicative ((,) a) where
     pure x = (mempty, x)
@@ -452,6 +488,23 @@ original default.
 
 -}
 
+-- | Same as '>>=', but with the arguments interchanged.
+{-# SPECIALISE (=<<) :: (a -> [b]) -> [a] -> [b] #-}
+(=<<)           :: Monad m => (a -> m b) -> m a -> m b
+f =<< x         = x >>= f
+
+-- | Conditional execution of monadic expressions. For example,
+--
+-- > when debug (putStrLn "Debugging")
+--
+-- will output the string @Debugging@ if the Boolean value @debug@
+-- is 'True', and otherwise do nothing.
+when    :: (Monad m) => Bool -> m () -> m ()
+{-# INLINEABLE when #-}
+{-# SPECIALISE when :: Bool -> IO () -> IO () #-}
+{-# SPECIALISE when :: Bool -> Maybe () -> Maybe () #-}
+when p s                = if p then s else return ()
+
 -- | Promote a function to a monad.
 liftM   :: (Monad m) => (a1 -> r) -> m a1 -> m r
 liftM f m1              = do { x1 <- m1; return (f x1) }
@@ -482,14 +535,19 @@ liftM5 f m1 m2 m3 m4 m5 = do { x1 <- m1; x2 <- m2; x3 <- m3; x4 <- m4; x5 <- m5;
 
 {-# INLINEABLE liftM #-}
 {-# SPECIALISE liftM :: (a1->r) -> IO a1 -> IO r #-}
+{-# SPECIALISE liftM :: (a1->r) -> Maybe a1 -> Maybe r #-}
 {-# INLINEABLE liftM2 #-}
 {-# SPECIALISE liftM2 :: (a1->a2->r) -> IO a1 -> IO a2 -> IO r #-}
+{-# SPECIALISE liftM2 :: (a1->a2->r) -> Maybe a1 -> Maybe a2 -> Maybe r #-}
 {-# INLINEABLE liftM3 #-}
 {-# SPECIALISE liftM3 :: (a1->a2->a3->r) -> IO a1 -> IO a2 -> IO a3 -> IO r #-}
+{-# SPECIALISE liftM3 :: (a1->a2->a3->r) -> Maybe a1 -> Maybe a2 -> Maybe a3 -> Maybe r #-}
 {-# INLINEABLE liftM4 #-}
 {-# SPECIALISE liftM4 :: (a1->a2->a3->a4->r) -> IO a1 -> IO a2 -> IO a3 -> IO a4 -> IO r #-}
+{-# SPECIALISE liftM4 :: (a1->a2->a3->a4->r) -> Maybe a1 -> Maybe a2 -> Maybe a3 -> Maybe a4 -> Maybe r #-}
 {-# INLINEABLE liftM5 #-}
 {-# SPECIALISE liftM5 :: (a1->a2->a3->a4->a5->r) -> IO a1 -> IO a2 -> IO a3 -> IO a4 -> IO a5 -> IO r #-}
+{-# SPECIALISE liftM5 :: (a1->a2->a3->a4->a5->r) -> Maybe a1 -> Maybe a2 -> Maybe a3 -> Maybe a4 -> Maybe a5 -> Maybe r #-}
 
 {- | In many situations, the 'liftM' operations can be replaced by uses of
 'ap', which promotes function application. 
@@ -521,6 +579,88 @@ instance Monad ((->) r) where
 instance Functor ((,) a) where
     fmap f (x,y) = (x, f y)
 
+
+instance  Functor Maybe  where
+    fmap _ Nothing       = Nothing
+    fmap f (Just a)      = Just (f a)
+
+instance Applicative Maybe where
+    pure = return
+    (<*>) = ap
+
+instance  Monad Maybe  where
+    (Just x) >>= k      = k x
+    Nothing  >>= _      = Nothing
+
+    (Just _) >>  k      = k
+    Nothing  >>  _      = Nothing
+
+    return              = Just
+    fail _              = Nothing
+
+-- -----------------------------------------------------------------------------
+-- The Alternative class definition
+
+infixl 3 <|>
+
+-- | A monoid on applicative functors.
+--
+-- Minimal complete definition: 'empty' and '<|>'.
+--
+-- If defined, 'some' and 'many' should be the least solutions
+-- of the equations:
+--
+-- * @some v = (:) '<$>' v '<*>' many v@
+--
+-- * @many v = some v '<|>' 'pure' []@
+class Applicative f => Alternative f where
+    -- | The identity of '<|>'
+    empty :: f a
+    -- | An associative binary operation
+    (<|>) :: f a -> f a -> f a
+
+    -- | One or more.
+    some :: f a -> f [a]
+    some v = some_v
+      where
+        many_v = some_v <|> pure []
+        some_v = (fmap (:) v) <*> many_v
+
+    -- | Zero or more.
+    many :: f a -> f [a]
+    many v = many_v
+      where
+        many_v = some_v <|> pure []
+        some_v = (fmap (:) v) <*> many_v
+
+
+instance Alternative Maybe where
+    empty = Nothing
+    Nothing <|> r = r
+    l       <|> _ = l
+
+-- -----------------------------------------------------------------------------
+-- The MonadPlus class definition
+
+-- | Monads that also support choice and failure.
+class (Alternative m, Monad m) => MonadPlus m where
+   -- | the identity of 'mplus'.  It should also satisfy the equations
+   --
+   -- > mzero >>= f  =  mzero
+   -- > v >> mzero   =  mzero
+   --
+   mzero :: m a
+   mzero = empty
+
+   -- | an associative operation
+   mplus :: m a -> m a -> m a
+   mplus = (<|>)
+
+instance MonadPlus Maybe where
+   mzero = Nothing
+
+   Nothing `mplus` ys  = ys
+   xs      `mplus` _ys = xs
 \end{code}
 
 
@@ -543,6 +683,14 @@ instance  Monad []  where
     m >> k              = foldr ((++) . (\ _ -> k)) [] m
     return x            = [x]
     fail _              = []
+
+instance Alternative [] where
+    empty = []
+    (<|>) = (++)
+
+instance MonadPlus [] where
+   mzero = []
+   mplus = (++)
 \end{code}
 
 A few list functions that appear here because they are used here.

@@ -860,6 +860,7 @@ typedef struct _RtsSymbolVal {
 #if !defined(mingw32_HOST_OS)
 #define RTS_USER_SIGNALS_SYMBOLS        \
    SymI_HasProto(setIOManagerControlFd) \
+   SymI_HasProto(setTimerManagerControlFd) \
    SymI_HasProto(setIOManagerWakeupFd)  \
    SymI_HasProto(ioManagerWakeup)       \
    SymI_HasProto(blockUserSignals)      \
@@ -1107,6 +1108,7 @@ typedef struct _RtsSymbolVal {
       SymI_HasProto(cmp_thread)                                         \
       SymI_HasProto(createAdjustor)                                     \
       SymI_HasProto(stg_decodeDoublezu2Intzh)                           \
+      SymI_HasProto(stg_decodeDoublezuInt64zh)                          \
       SymI_HasProto(stg_decodeFloatzuIntzh)                             \
       SymI_HasProto(defaultsHook)                                       \
       SymI_HasProto(stg_delayzh)                                        \

@@ -58,8 +58,6 @@ module Data.Foldable (
     find
     ) where
 
-import Control.Applicative
-import Control.Monad ( Monad(..), MonadPlus(..) )
 import Data.Bool
 import Data.Either
 import Data.Eq
@@ -70,8 +68,7 @@ import Data.Ord
 import Data.Proxy
 
 import GHC.Arr  ( Array(..), Ix(..), elems )
-import GHC.Base ( (.), ($!), error, flip, id )
-import GHC.Exts ( build )
+import GHC.Base hiding ( foldr )
 import GHC.Num  ( Num(..) )
 
 -- | Data structures that can be folded.
@@ -203,9 +200,6 @@ instance Foldable Proxy where
     {-# INLINE foldl1 #-}
     foldr1 _ _ = error "foldr1: Proxy"
     {-# INLINE foldr1 #-}
-
-instance Foldable (Const m) where
-    foldMap _ _ = mempty
 
 -- | Monadic fold over the elements of a structure,
 -- associating to the right, i.e. from right to left.
