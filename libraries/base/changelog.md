@@ -32,6 +32,33 @@
   * Set fixity for `Data.Foldable.{elem,notElem}` to match the
     conventional one set for `Data.List.{elem,notElem}` (#9610)
 
+  * Turn `toList`, `elem`, `sum`, `product`, `maximum`, and `minimum`
+    into `Foldable` methods (#9621)
+
+  * Replace the `Data.List`-exported functions
+
+    ```
+    all, and, any, concat, concatMap, elem, find, product, sum
+    ```
+
+    by re-exports of their generalised `Data.Foldable` counterparts.
+    In other words, unqualified imports of `Data.List` and
+    `Data.Foldable` no longer lead to conflicting definitions. (#9586)
+
+  * Replace the `Control.Monad`-exported functions
+
+    ```
+    sequence_, msum, mapM_, forM_
+    ```
+
+    by re-exports of their generalised `Data.Foldable` counterparts.
+    In other words, unqualified imports of `Control.Monad` and
+    `Data.Foldable` no longer lead to conflicting definitions. (#9586)
+
+  * New module `Data.OldList` containing only list-specialised versions of
+    the functions from `Data.List` (in other words, `Data.OldList` corresponds
+    to `base-4.7.0.1`'s `Data.List`)
+
 ## 4.7.0.1  *Jul 2014*
 
   * Bundled with GHC 7.8.3
